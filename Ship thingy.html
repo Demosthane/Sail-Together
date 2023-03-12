@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Ships</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4">Video Game Group Waitlist</h1>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h2>Join the Waitlist</h2>
+        <form id="waitlist-form">
+          <div class="form-group">
+            <label for="name-input">Name:</label>
+            <input type="text" class="form-control" id="name-input" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Join Waitlist</button>
+        </form>
+      </div>
+
+      <div class="col-md-6">
+        <h2>Waitlist</h2>
+        <table id="waitlist-table" class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="waitlist-table-body">
+            <!-- Waitlist rows will be added here dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h2>Add Ship</h2>
+        <form id="add-ship-form">
+          <div class="form-group">
+            <label for="ship-type-input">Ship Type:</label>
+            <input type="text" class="form-control" id="ship-type-input">
+          </div>
+          <div class="form-group">
+            <label for="slots-dropdown">Open Slots:</label>
+            <select id="slots-dropdown" class="form-control">
+              <option value="2">2 slots</option>
+              <option value="3">3 slots</option>
+              <option value="4">4 slots</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Add Ship</button>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <div id="ship-cards">
+          <!-- dynamic content will be added here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <script>
+  // Waitlist JavaScript code
+        const waitlistForm = document.querySelector('#waitlist-form');
+        const waitlistTable = document.querySelector('#waitlist-table');
+        const waitlistTableBody = document.querySelector('#waitlist-table-body');
+        const waitlist = [];
+        const shipCards = document.getElementById('ship-cards');
+        const addShipForm = document.getElementById('add-ship-form');
+
+addShipForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+      const shipTypeInput = document.getElementById('ship-type-input');
+      const slotsDropdown = document.getElementById('slots-dropdown');
+      const openSlots = slotsDropdown.value;
+
+  createShipCard(shipTypeInput.value, openSlots);
+}); 
+
+function createShipCard(shipType, openSlots) {
+  const card = document.createElement('div');
+  card.classList.add('ship-card');
+  card.innerHTML = `
+    <h3>${shipType}</h3>
+    <div class="crew-list">
+      <h4>Crew:</h4>
+      <ul class="crew-members"></ul>
+    </div>
+    <div class="waitlist-dropdown">
+      <h4>Waitlist:</h4>
+      <select class="waitlist-select">       
+      </select>
+    </div>
+    <button class="delete-ship-button">Delete Ship</button>
+  `;
+
+  const waitlistSelect = card.querySelector('.waitlist-select');
+  const crewList = card.querySelector('.crew-members');
+  const deleteButton = card.querySelector('.delete-ship-button');
+
+  function updateWaitlistDropdowns() {
+    waitlistSelect.innerHTML = '<option value="default">Select a crew member</option>';
+    waitlist.forEach((name) => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      waitlistSelect.appendChild(option);
+    });
+  }
+
+  updateWaitlistDropdowns();
+
+  waitlistSelect.addEventListener('change', (e) => {
+    const selectedName = e.target.value;
+
+    if (selectedName === "default") {
+      updateWaitlistDropdowns();
+    } else if (crewList.children.length < openSlots) {
+      const crewMember = document.createElement('li');
+      crewMember.textContent = selectedName;
+      const removeButton = document.createElement('button');
+      removeButton.textContent = 'Remove';
+      removeButton.addEventListener('click', () => {
+        crewMember.remove();
+      });
+      crewMember.appendChild(removeButton);
+      crewList.appendChild(crewMember);
+
+      removeFromWaitlist(selectedName);
+      updateWaitlistDropdowns();
+    } else {
+      alert(`This ship is already full with ${openSlots} crew members!`);
+      waitlistSelect.value = '';
+    }
+  });
+
+  deleteButton.addEventListener('click', () => {
+    card.remove();
+  });
+
+  shipCards.appendChild(card);
+}
+
+function updateWaitlistTable() {
+  // Remove all rows from the table
+  while (waitlistTableBody.firstChild) {
+    waitlistTableBody.removeChild(waitlistTableBody.firstChild);
+  }
+
+  // Add rows based on the updated waitlist array
+  waitlist.forEach((name) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${name}</td>
+      <td><button class="remove-button">Remove</button></td>
+    `;
+    waitlistTableBody.appendChild(row);
+  });
+}
+
+function addToWaitlist(name) {
+  waitlist.push(name);
+
+  const option = document.createElement('option');
+  option.value = name;
+  option.textContent = name;
+
+  const waitlistSelects = document.querySelectorAll('.waitlist-select');
+  waitlistSelects.forEach((select) => {
+    select.appendChild(option.cloneNode(true));
+  });
+
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${name}</td>
+    <td><button class="remove-button">Remove</button></td>
+  `;
+
+  const removeButton = row.querySelector('.remove-button');
+  removeButton.addEventListener('click', () => {
+    removeFromWaitlist(name);
+    row.remove();
+
+    waitlistSelects.forEach((select) => {
+      Array.from(select.options).forEach((option) => {
+        if (option.value === name) {
+          option.remove();
+        }
+      });
+    });
+  });
+
+  waitlistTableBody.appendChild(row);
+}
+
+function removeFromWaitlist(name) {
+  const index = waitlist.indexOf(name);
+  waitlist.splice(index, 1);   
+  updateWaitlistTable();
+}
+
+waitlistForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nameInput = document.querySelector('#name-input');
+  const name = nameInput.value;
+  addToWaitlist(name);
+  nameInput.value = '';
+});
+
+waitlistTableBody.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    const row = e.target.parentNode.parentNode;
+    const name = row.children[0].textContent;
+    row.remove();
+    removeFromWaitlist(name);
+  }
+});
+
+function addNameToWaitlist(name) {
+  waitlist.push(name); 
+  updateWaitlistTable();
+}
+
+function getWaitlist() {
+  // Return an array of crew members on the waitlist
+  return waitlist.slice();
+}
+
+
+function updateWaitlistDropdowns() {
+  const dropdowns = document.querySelectorAll('.waitlist-select');
+  dropdowns.forEach((dropdown) => {
+    const selectedName = dropdown.value;
+    const waitlist = getWaitlist();
+    dropdown.innerHTML = '';
+
+    waitlist.forEach((name) => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      dropdown.appendChild(option);
+    });
+
+    if (selectedName) {
+      dropdown.value = selectedName;
+    }
+  });
+}
+  </script>
+</body>
+</html>
