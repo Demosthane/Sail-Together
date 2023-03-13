@@ -6,12 +6,121 @@
   <title>My Ships</title>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+  <style>
+
+body.dark-mode {
+  background-color: #222;
+  color: #fff;
+}
+
+.ship-card {
+  border: 1px solid #444;
+}
+
+.ship-card h3 {
+  color: #000000;
+}
+
+.dark-mode .ship-card h3 {
+  color: #ffffff;
+}
+.ship-card button {
+  background-color: #444;
+  border-color: #444;
+  color: #fff;
+}
+
+.ship-card .crew-list {
+  color: #000000;
+}
+
+.dark-mode .ship-card .crew-list {
+  color: #ffffff;
+}
+
+.ship-card .waitlist-dropdown {
+  color: #fff;
+}
+
+.ship-card .waitlist-dropdown select {
+  background-color: #444;
+  border-color: #444;
+  color: #fff;
+}
+
+
+.ship-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  margin-right: 16px;
+  margin-bottom: 16px;
+  width: 300px;
+}
+
+.ship-card h3 {
+  margin-top: 0;
+}
+
+.ship-card button {
+  margin-top: 16px;
+}
+
+.ship-card .crew-list {
+  margin-bottom: 16px;
+}
+
+.ship-card .crew-list ul {
+  margin-top: 8px;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.ship-card .crew-list li {
+  display: flex;
+  align-items: center;
+}
+
+.ship-card .crew-list li button {
+  margin-left: auto;
+}
+
+.ship-card .waitlist-dropdown {
+  margin-bottom: 16px;
+}
+
+.ship-card .waitlist-dropdown select {
+  width: 100%;
+  margin-bottom: 0;
+  padding: 8px;
+border-radius: 4px;
+border: 1px solid #ccc;
+font-size: 16px;
+font-family: Arial, sans-serif;
+}
+
+.ship-card .waitlist-dropdown label {
+display: block;
+margin-bottom: 8px;
+}
+
+.ship-card .waitlist-dropdown p {
+margin-top: 8px;
+}
+
+div {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+  </style>
 </head>
 
 <body>
   <div class="container mt-5">
-    <h1 class="mb-4">Video Game Group Waitlist</h1>
-
+    <h1 class="mb-4">Sail Together Waitlist</h1>
+    <button id="dark-mode-toggle">Toggle Dark Mode</button>
     <div class="row">
       <div class="col-md-6">
         <h2>Join the Waitlist</h2>
@@ -25,30 +134,11 @@
       </div>
 
       <div class="col-md-6">
-        <h2>Waitlist</h2>
-        <table id="waitlist-table" class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="waitlist-table-body">
-            <!-- Waitlist rows will be added here dynamically -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <hr>
-
-    <div class="row">
-      <div class="col-md-6">
         <h2>Add Ship</h2>
         <form id="add-ship-form">
           <div class="form-group">
-            <label for="ship-type-input">Ship Type:</label>
-            <input type="text" class="form-control" id="ship-type-input">
+            <label for="ship-name-input">Ship Name:</label>
+            <input type="text" class="form-control" id="ship-name-input">
           </div>
           <div class="form-group">
             <label for="slots-dropdown">Open Slots:</label>
@@ -60,15 +150,37 @@
           </div>
           <button type="submit" class="btn btn-primary">Add Ship</button>
         </form>
-      </div>
-      <div class="col-md-6">
-        <div id="ship-cards">
+      </div>		
+          
+    </div>
+
+    <div class="col-md-6">
+      <h2>Waitlist</h2>
+      <table id="waitlist-table" class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="waitlist-table-body">
+          <!-- Waitlist rows will be added here dynamically -->
+        </tbody>
+      </table>
+    </div>
+  
+    <hr>
+  
+
+    <div class="row">
+      <div class="col-md-12">
+        <div id="ship-cards" class="d-flex flex-wrap">
           <!-- dynamic content will be added here -->
         </div>
       </div>
     </div>
-  </div>
 
+  
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
@@ -86,28 +198,37 @@
 addShipForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
-      const shipTypeInput = document.getElementById('ship-type-input');
+      const shipNameInput = document.getElementById('ship-name-input');
       const slotsDropdown = document.getElementById('slots-dropdown');
       const openSlots = slotsDropdown.value;
 
-  createShipCard(shipTypeInput.value, openSlots);
-}); 
+  createShipCard(shipNameInput.value, openSlots);
+});
 
-function createShipCard(shipType, openSlots) {
+function createShipCard(shipName, openSlots) {
   const card = document.createElement('div');
   card.classList.add('ship-card');
+
+  let title = '';
+  if (openSlots == 2) {
+    title = 'Sloop';
+  } else if (openSlots == 3) {
+    title = 'Brigantine';
+  } else if (openSlots == 4) {
+    title = 'Galleon';
+  }
+
   card.innerHTML = `
-    <h3>${shipType}</h3>
+    <h3>${title} - ${shipName}</h3>
     <div class="crew-list">
       <h4>Crew:</h4>
       <ul class="crew-members"></ul>
     </div>
     <div class="waitlist-dropdown">
       <h4>Waitlist:</h4>
-      <select class="waitlist-select">       
-      </select>
+      <select class="waitlist-select"></select>
     </div>
-    <button class="delete-ship-button">Delete Ship</button>
+    <button class="delete-ship-button">Delete Ship</button>   
   `;
 
   const waitlistSelect = card.querySelector('.waitlist-select');
@@ -138,6 +259,8 @@ function createShipCard(shipType, openSlots) {
       removeButton.textContent = 'Remove';
       removeButton.addEventListener('click', () => {
         crewMember.remove();
+        addToWaitlist(selectedName);
+        updateWaitlistDropdowns();
       });
       crewMember.appendChild(removeButton);
       crewList.appendChild(crewMember);
@@ -149,14 +272,14 @@ function createShipCard(shipType, openSlots) {
       waitlistSelect.value = '';
     }
   });
-
+  
   deleteButton.addEventListener('click', () => {
     card.remove();
   });
 
   shipCards.appendChild(card);
-}
 
+	}	
 function updateWaitlistTable() {
   // Remove all rows from the table
   while (waitlistTableBody.firstChild) {
@@ -171,6 +294,21 @@ function updateWaitlistTable() {
       <td><button class="remove-button">Remove</button></td>
     `;
     waitlistTableBody.appendChild(row);
+
+    const removeButton = row.querySelector('.remove-button');
+    removeButton.addEventListener('click', () => {
+      removeFromWaitlist(name);
+      row.remove();
+
+      const waitlistSelects = document.querySelectorAll('.waitlist-select');
+      waitlistSelects.forEach((select) => {
+        Array.from(select.options).forEach((option) => {
+          if (option.value === name) {
+            option.remove();
+          }
+        });
+      });
+    });
   });
 }
 
@@ -262,6 +400,13 @@ function updateWaitlistDropdowns() {
     }
   });
 }
+
+const darkModeToggle = document.querySelector('#dark-mode-toggle');
+const body = document.querySelector('body');
+
+darkModeToggle.addEventListener('click', () => {
+  body.classList.toggle('dark-mode');
+});
   </script>
 </body>
 </html>
